@@ -130,7 +130,7 @@ Behold &Behold::operator<<(const std::vector<int> &v) {
     else {
         s << "std::vector<len=" << v.size() << ">";
     }
-    line.push_back(s.str());
+    m_line.push_back(s.str());
     return *this;
 }
 
@@ -153,7 +153,7 @@ Behold &Behold::operator<<(const std::set<int> &s) {
     else {
         sstr << "std::set<len=" << s.size() << ">";
     }
-    line.push_back(sstr.str());
+    m_line.push_back(sstr.str());
     return *this;
 }
 

@@ -49,15 +49,29 @@
 
 enum class LogManip {NO_SPACE};
 
-struct Behold {  
-    std::list<std::string> line;
-    static const int SET_MAX_SIZE = 5;
-    static const int VECTOR_MAX_SIZE = 5;
-    std::vector<bool> no_space_indexes;
 
-    Behold() {
-        no_space_indexes.reserve(64);
-    }
+enum LogLevel {
+    LOG_DEVEL = 0,
+    LOG_DEBUG = 10,
+    LOG_INFO = 20,
+    LOG_WARNING = 30,
+    LOG_ERROR = 40,
+    LOG_CRITICAL = 50,
+    LOG_FATAL = 60,
+} ;
+
+
+class Behold {
+public:
+    explicit Behold(LogLevel l=LOG_DEVEL, const char *lc="");
+    
+    static Behold devel(const char *lc);
+    static Behold debug(const char *lc);
+    static Behold info(const char *lc);
+    static Behold warning(const char *lc);
+    static Behold error(const char *lc);
+    static Behold critical(const char *lc);
+    static Behold fatal(const char *lc);
 
     Behold &operator<<(LogManip lm);
     Behold &operator<<(const std::string &s);
@@ -71,7 +85,7 @@ struct Behold {
     Behold &operator <<(const std::vector<T> &v) {
         std::stringstream s;
         s << "std::vector<len=" << v.size() << ">";
-        line.push_back(s.str());
+        m_line.push_back(s.str());
         return *this;
     }
 
@@ -79,7 +93,7 @@ struct Behold {
     Behold &operator <<(const std::set<T> &s) {
         std::stringstream sstr;
         s << "std::set<len=" << s.size() << ">";
-        line.push_back(sstr.str());
+        m_line.push_back(sstr.str());
         return *this;
     }
 
@@ -87,7 +101,7 @@ struct Behold {
     Behold &operator <<(const std::map<K, V> &m) {
         std::stringstream s;
         s << "Map<len=" << m.size() << ">";
-        line.push_back(s.str());
+        m_line.push_back(s.str());
         return *this;
     }
 
@@ -96,7 +110,7 @@ struct Behold {
     operator<<(T t) {
         std::stringstream s;
         s << t;
-        line.push_back(s.str());
+        m_line.push_back(s.str());
         return *this;
     }
 
@@ -112,14 +126,24 @@ struct Behold {
     operator<<(const T &t) {
         std::stringstream s;
         s << t;
-        line.push_back(s.str());
+        m_line.push_back(s.str());
         return *this;
     }
 
     ~Behold();
 
 private:    
+    static const int SET_MAX_SIZE = 5;
+    static const int VECTOR_MAX_SIZE = 5;
+
     static std::mutex s_mutex;
+
+    std::vector<bool> m_no_space_indexes;
+
+    LogLevel m_level;
+
+    std::list<std::string> m_line;
+
 };
 
 // we need this because of trailing comma issue with __VA_ARGS__

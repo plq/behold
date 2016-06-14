@@ -36,7 +36,7 @@ struct NotLoggable {
     const char *b;
 };
 
-int main() {
+int main(int, char **) {
     std::vector<int> vi = {1, 2, 3, 4};
     std::vector<std::string> vs = {"a", "b", "c"};
     Loggable l;

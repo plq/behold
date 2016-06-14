@@ -48,12 +48,14 @@ Behold &Behold::operator<<(const char *s) {
 }
 
 #ifdef HAVE_MSGPACK
+
 Behold &Behold::operator<<(const msgpack::v1::type::raw_ref &raw) {
     std::stringstream s;
     s << "msgpack::raw<len=" << raw.size << ">";
     line.push_back(s.str());
     return *this;
 }
+
 #endif
 
 template <>

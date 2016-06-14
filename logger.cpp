@@ -25,6 +25,37 @@
 
 #include <logger.h>
 
+LogEntry &LogEntry::operator<<(LogManip lm) {
+    switch (lm) {
+    case LogManip::NO_SPACE:
+        auto s = line.size();
+        no_space_indexes.resize(s+1);
+        no_space_indexes[s] = true;
+        break;
+    }
+
+    return *this;
+}
+
+LogEntry &LogEntry::operator<<(const std::string &s) {
+    line.push_back(s);
+    return *this;
+}
+
+LogEntry &LogEntry::operator<<(const char *s) {
+    line.push_back(s);
+    return *this;
+}
+
+#ifdef HAVE_MSGPACK
+LogEntry &LogEntry::operator<<(const msgpack::v1::type::raw_ref &raw) {
+    std::stringstream s;
+    s << "msgpack::raw<len=" << raw.size << ">";
+    line.push_back(s.str());
+    return *this;
+}
+#endif
+
 template <>
 LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
     auto size = v.size();

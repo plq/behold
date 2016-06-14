@@ -58,6 +58,14 @@ struct LogEntry {
         no_space_indexes.reserve(64);
     }
 
+    LogEntry &operator<<(LogManip lm);
+    LogEntry &operator<<(const std::string &s);
+    LogEntry &operator<<(const char *s);
+
+    #ifdef HAVE_MSGPACK
+    LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw);
+    #endif
+
     template <typename T>
     LogEntry &operator <<(const std::vector<T> &v) {
         std::stringstream s;
@@ -73,37 +81,6 @@ struct LogEntry {
         line.push_back(sstr.str());
         return *this;
     }
-
-    LogEntry &operator<<(LogManip lm) {
-        switch (lm) {
-        case LogManip::NO_SPACE:
-            auto s = line.size();
-            no_space_indexes.resize(s+1);
-            no_space_indexes[s] = true;
-            break;
-        }
-
-        return *this;
-    }
-
-    LogEntry &operator<<(const std::string &s) {
-        line.push_back(s);
-        return *this;
-    }
-
-    LogEntry &operator<<(const char *s) {
-        line.push_back(s);
-        return *this;
-    }
-
-#ifdef HAVE_MSGPACK
-    LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw) {
-        std::stringstream s;
-        s << "msgpack::raw<len=" << raw.size << ">";
-        line.push_back(s.str());
-        return *this;
-    }
-#endif
 
     template <typename K, typename V>
     LogEntry &operator <<(const std::map<K, V> &m) {

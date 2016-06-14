@@ -25,6 +25,8 @@
 
 #include <behold.h>
 
+std::mutex Behold::s_mutex;
+
 Behold::Behold(LogLevel l, const char *lc): m_level(l) {
     if (m_level <= LOG_DEVEL) {
         m_line.push_back("d");
@@ -56,6 +58,8 @@ Behold::Behold(LogLevel l, const char *lc): m_level(l) {
 }
 
 Behold::~Behold() {
+    s_mutex.lock();
+
     auto b = m_no_space_indexes.cbegin();
     auto e = m_no_space_indexes.cend();
     auto i = b + 1;
@@ -70,14 +74,16 @@ Behold::~Behold() {
         ++i;
     }
     std::cout << std::endl;
+
+    s_mutex.unlock();
 }
 
 Behold &Behold::operator<<(LogManip lm) {
     switch (lm) {
     case LogManip::NO_SPACE:
-        auto s = line.size();
-        no_space_indexes.resize(s+1);
-        no_space_indexes[s] = true;
+        auto s = m_line.size();
+        m_no_space_indexes.resize(s + 1, false);
+        m_no_space_indexes[s] = true;
         break;
     }
 
@@ -85,12 +91,12 @@ Behold &Behold::operator<<(LogManip lm) {
 }
 
 Behold &Behold::operator<<(const std::string &s) {
-    line.push_back(s);
+    m_line.push_back(s);
     return *this;
 }
 
 Behold &Behold::operator<<(const char *s) {
-    line.push_back(s);
+    m_line.push_back(s);
     return *this;
 }
 
@@ -99,7 +105,7 @@ Behold &Behold::operator<<(const char *s) {
 Behold &Behold::operator<<(const msgpack::v1::type::raw_ref &raw) {
     std::stringstream s;
     s << "msgpack::raw<len=" << raw.size << ">";
-    line.push_back(s.str());
+    m_line.push_back(s.str());
     return *this;
 }
 

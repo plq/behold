@@ -26,6 +26,7 @@
 #include<map>
 #include<set>
 #include<list>
+#include<mutex>
 #include<vector>
 #include<sstream>
 #include<iostream>
@@ -117,6 +118,8 @@ struct Behold {
 
     ~Behold();
 
+private:    
+    static std::mutex s_mutex;
 };
 
 // we need this because of trailing comma issue with __VA_ARGS__

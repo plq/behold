@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include<logger.h>
+#include<behold.h>
 
 
 struct Loggable {
@@ -37,7 +37,8 @@ struct NotLoggable {
 };
 
 int main() {
-    std::vector<int> v = {1, 2, 3, 4};
+    std::vector<int> vi = {1, 2, 3, 4};
+    std::vector<std::string> vs = {"a", "b", "c"};
     Loggable l;
     //NotLoggable nl;
 
@@ -52,9 +53,15 @@ int main() {
 
 #endif
 
-    LogEntry() << "Some std::vector:" << v
-               << "A loggable class:" << l
-               << "A string:" << raw;
+    Behold() << "A std::vector<int>:" << vi;
+    Behold() << "A std::vector<std::string>:" << vs;
+    Behold() << "A loggable class:" << l;
+    Behold() << "A string:" << raw;
+    Behold() << "Some numbers with no spaces:"
+        << 5 << LogManip::NO_SPACE
+        << 6 << LogManip::NO_SPACE
+        << 7 << LogManip::NO_SPACE
+        << 8 << LogManip::NO_SPACE;
 
     return 0;
 }

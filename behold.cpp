@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-#include <logger.h>
+#include <behold.h>
 
-LogEntry &LogEntry::operator<<(LogManip lm) {
+Behold &Behold::operator<<(LogManip lm) {
     switch (lm) {
     case LogManip::NO_SPACE:
         auto s = line.size();
@@ -37,18 +37,18 @@ LogEntry &LogEntry::operator<<(LogManip lm) {
     return *this;
 }
 
-LogEntry &LogEntry::operator<<(const std::string &s) {
+Behold &Behold::operator<<(const std::string &s) {
     line.push_back(s);
     return *this;
 }
 
-LogEntry &LogEntry::operator<<(const char *s) {
+Behold &Behold::operator<<(const char *s) {
     line.push_back(s);
     return *this;
 }
 
 #ifdef HAVE_MSGPACK
-LogEntry &LogEntry::operator<<(const msgpack::v1::type::raw_ref &raw) {
+Behold &Behold::operator<<(const msgpack::v1::type::raw_ref &raw) {
     std::stringstream s;
     s << "msgpack::raw<len=" << raw.size << ">";
     line.push_back(s.str());
@@ -57,7 +57,7 @@ LogEntry &LogEntry::operator<<(const msgpack::v1::type::raw_ref &raw) {
 #endif
 
 template <>
-LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
+Behold &Behold::operator<<(const std::vector<int> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -80,7 +80,7 @@ LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
 }
 
 template <>
-LogEntry &LogEntry::operator<<(const std::set<int> &s) {
+Behold &Behold::operator<<(const std::set<int> &s) {
     auto size = s.size();
     std::stringstream sstr;
     if (size < SET_MAX_SIZE) {

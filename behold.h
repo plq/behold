@@ -38,36 +38,36 @@
 
 
 #define MAKE_LOGGABLE(...) \
-    void to_logger(LogEntry &l) const { \
+    void to_behold(Behold &l) const { \
         l << typeid(*this).name() \
           << LogManip::NO_SPACE << "(" << LogManip::NO_SPACE; \
-        LogHelper(l).to_logger(__VA_ARGS__); \
+        LogHelper(l).to_behold(__VA_ARGS__); \
         l << LogManip::NO_SPACE << ")" ; \
     } \
 
 
 enum class LogManip {NO_SPACE};
 
-struct LogEntry {  
+struct Behold {  
     std::list<std::string> line;
     static const int SET_MAX_SIZE = 5;
     static const int VECTOR_MAX_SIZE = 5;
     std::vector<bool> no_space_indexes;
 
-    LogEntry() {
+    Behold() {
         no_space_indexes.reserve(64);
     }
 
-    LogEntry &operator<<(LogManip lm);
-    LogEntry &operator<<(const std::string &s);
-    LogEntry &operator<<(const char *s);
+    Behold &operator<<(LogManip lm);
+    Behold &operator<<(const std::string &s);
+    Behold &operator<<(const char *s);
 
     #ifdef HAVE_MSGPACK
-    LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw);
+    Behold &operator<<(const msgpack::v1::type::raw_ref &raw);
     #endif
 
     template <typename T>
-    LogEntry &operator <<(const std::vector<T> &v) {
+    Behold &operator <<(const std::vector<T> &v) {
         std::stringstream s;
         s << "std::vector<len=" << v.size() << ">";
         line.push_back(s.str());
@@ -75,7 +75,7 @@ struct LogEntry {
     }
 
     template <typename T>
-    LogEntry &operator <<(const std::set<T> &s) {
+    Behold &operator <<(const std::set<T> &s) {
         std::stringstream sstr;
         s << "std::set<len=" << s.size() << ">";
         line.push_back(sstr.str());
@@ -83,7 +83,7 @@ struct LogEntry {
     }
 
     template <typename K, typename V>
-    LogEntry &operator <<(const std::map<K, V> &m) {
+    Behold &operator <<(const std::map<K, V> &m) {
         std::stringstream s;
         s << "Map<len=" << m.size() << ">";
         line.push_back(s.str());
@@ -91,7 +91,7 @@ struct LogEntry {
     }
 
     template <typename T>
-    typename std::enable_if<std::is_arithmetic<T>::value, LogEntry &>::type
+    typename std::enable_if<std::is_arithmetic<T>::value, Behold &>::type
     operator<<(T t) {
         std::stringstream s;
         s << t;
@@ -100,14 +100,14 @@ struct LogEntry {
     }
 
     template <typename T>
-    typename std::enable_if<std::is_class<T>::value, LogEntry &>::type
+    typename std::enable_if<std::is_class<T>::value, Behold &>::type
     operator<<(const T &t) {
-        t.to_logger(*this);
+        t.to_behold(*this);
         return *this;
     }
 
     template <typename T>
-    typename std::enable_if<std::is_enum<T>::value, LogEntry &>::type
+    typename std::enable_if<std::is_enum<T>::value, Behold &>::type
     operator<<(const T &t) {
         std::stringstream s;
         s << t;
@@ -115,7 +115,7 @@ struct LogEntry {
         return *this;
     }
 
-    ~LogEntry() {
+    ~Behold() {
         std::cout << time(NULL) << ": ";
         auto b = no_space_indexes.cbegin();
         auto e = no_space_indexes.cend();
@@ -136,21 +136,19 @@ struct LogEntry {
 
 // we need this because of trailing comma issue with __VA_ARGS__
 struct LogHelper {
-    LogEntry &logger;
-    explicit LogHelper(LogEntry &l): logger(l) { }
+    Behold &behold;
+    explicit LogHelper(Behold &l): behold(l) { }
 
-    inline void to_logger() { }
+    inline void to_behold() { }
 
     template<typename First>
-    void to_logger(First && first) {
-        logger << std::forward<First>(first);
+    void to_behold(First && first) {
+        behold << std::forward<First>(first);
     }
 
     template<typename First, typename ...Rest>
-    void to_logger(First && first, Rest && ...rest) {
-        std::stringstream s;
-        s << std::forward<First>(first) << ", ";
-        logger << s.str();
-        to_logger(std::forward<Rest>(rest)...);
+    void to_behold(First && first, Rest && ...rest) {
+        behold << std::forward<First>(first) << LogManip::NO_SPACE << ",";
+        to_behold(std::forward<Rest>(rest)...);
     }
 };

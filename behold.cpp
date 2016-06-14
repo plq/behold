@@ -25,6 +25,23 @@
 
 #include <behold.h>
 
+Behold::~Behold() {
+    auto b = m_no_space_indexes.cbegin();
+    auto e = m_no_space_indexes.cend();
+    auto i = b + 1;
+    for (auto &s: m_line) {
+        std::cout << s;
+
+        auto has_nosp = (i < e && (*i));
+        if (! has_nosp) {
+            std::cout << " ";
+        }
+
+        ++i;
+    }
+    std::cout << std::endl;
+}
+
 Behold &Behold::operator<<(LogManip lm) {
     switch (lm) {
     case LogManip::NO_SPACE:

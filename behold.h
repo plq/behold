@@ -115,23 +115,8 @@ struct Behold {
         return *this;
     }
 
-    ~Behold() {
-        std::cout << time(NULL) << ": ";
-        auto b = no_space_indexes.cbegin();
-        auto e = no_space_indexes.cend();
-        auto i = b + 1;
-        for (auto &s: line) {
-            std::cout << s;
+    ~Behold();
 
-            auto has_nosp = (i < e && (*i));
-            if (! has_nosp) {
-                std::cout << " ";
-            }
-
-            ++i;
-        }
-        std::cout << std::endl;
-    }
 };
 
 // we need this because of trailing comma issue with __VA_ARGS__

@@ -25,6 +25,7 @@
 
 #include<behold.h>
 
+static const char *LC = "MAIN";
 
 struct Loggable {
     int a;
@@ -53,11 +54,11 @@ int main(int, char **) {
 
 #endif
 
-    Behold() << "A std::vector<int>:" << vi;
-    Behold() << "A std::vector<std::string>:" << vs;
-    Behold() << "A loggable class:" << l;
-    Behold() << "A string:" << raw;
-    Behold() << "Some numbers with no spaces:"
+    Behold::info(LC) << "A std::vector<int>:" << vi;
+    Behold::debug(LC) << "A std::vector<std::string>:" << vs;
+    Behold::error(LC) << "A loggable class:" << l;
+    Behold::critical(LC) << "A string:" << raw;
+    Behold::devel(LC) << "Some numbers with no spaces:"
         << 5 << LogManip::NO_SPACE
         << 6 << LogManip::NO_SPACE
         << 7 << LogManip::NO_SPACE

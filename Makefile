@@ -5,7 +5,7 @@ HAVE_MSGPACK := $(shell echo "\#include<msgpack.hpp>" \
 
 CXXFLAGS := -g -Wall -Wextra -std=c++11 -I. $(HAVE_MSGPACK)
 
-all: behold
+all: behold test
 
 behold: main.o behold.o
 	g++ main.o behold.o -o behold
@@ -17,4 +17,10 @@ main.o: main.cpp behold.h
 	g++ -c main.cpp -o main.o $(CXXFLAGS)
 
 clean:
-	-rm -fv behold *.o
+	-rm -fv behold test *.o
+
+test.o: behold.h test.cpp
+	g++ -c test.cpp -o test.o $(CXXFLAGS)
+
+test: behold.o test.o
+	g++ test.o behold.o -o test

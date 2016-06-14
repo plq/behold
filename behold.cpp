@@ -25,6 +25,36 @@
 
 #include <behold.h>
 
+Behold::Behold(LogLevel l, const char *lc): m_level(l) {
+    if (m_level <= LOG_DEVEL) {
+        m_line.push_back("d");
+    }
+    else if (m_level <= LOG_DEBUG) {
+        m_line.push_back("D");
+    }
+    else if (m_level <= LOG_INFO) {
+        m_line.push_back("I");
+    }
+    else if (m_level <= LOG_WARNING) {
+        m_line.push_back("W");
+    }
+    else if (m_level <= LOG_ERROR) {
+        m_line.push_back("E");
+    }
+    else if (m_level <= LOG_CRITICAL) {
+        m_line.push_back("C");
+    }
+    else if (m_level <= LOG_FATAL) {
+        m_line.push_back("F");
+    }
+    else {
+        m_line.push_back("?");
+    }
+
+    *this << time(NULL) << LogManip::NO_SPACE << ":";    
+    *this << lc << "|";
+}
+
 Behold::~Behold() {
     auto b = m_no_space_indexes.cbegin();
     auto e = m_no_space_indexes.cend();
@@ -119,4 +149,32 @@ Behold &Behold::operator<<(const std::set<int> &s) {
     }
     line.push_back(sstr.str());
     return *this;
+}
+
+Behold Behold::devel(const char *lc) {
+    return Behold(LOG_DEVEL, lc);
+}
+
+Behold Behold::debug(const char *lc) {
+    return Behold(LOG_DEBUG, lc);
+}
+
+Behold Behold::info(const char *lc) {
+    return Behold(LOG_INFO, lc);
+}
+
+Behold Behold::warning(const char *lc) {
+    return Behold(LOG_WARNING, lc);
+}
+
+Behold Behold::error(const char *lc) {
+    return Behold(LOG_ERROR, lc);
+}
+
+Behold Behold::critical(const char *lc) {
+    return Behold(LOG_CRITICAL, lc);
+}
+
+Behold Behold::fatal(const char *lc) {
+    return Behold(LOG_FATAL, lc);
 }

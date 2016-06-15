@@ -25,9 +25,9 @@
 
 #include <behold.h>
 
-std::mutex Behold::s_mutex;
+std::mutex LogEntry::s_mutex;
 
-Behold::Behold(LogLevel l, const char *lc): m_level(l) {
+LogEntry::LogEntry(LogLevel l, const char *lc): m_level(l) {
     if (m_level <= LOG_DEVEL) {
         m_line.push_back("d");
     }
@@ -57,7 +57,7 @@ Behold::Behold(LogLevel l, const char *lc): m_level(l) {
     *this << lc << "|";
 }
 
-Behold::~Behold() {
+LogEntry::~LogEntry() {
     std::lock_guard<std::mutex> guard(s_mutex);
 
     auto b = m_no_space_indexes.cbegin();
@@ -77,7 +77,7 @@ Behold::~Behold() {
     std::cout << std::endl;
 }
 
-Behold &Behold::operator<<(LogManip lm) {
+LogEntry &LogEntry::operator<<(LogManip lm) {
     switch (lm) {
     case LogManip::NO_SPACE:
         auto s = m_line.size();
@@ -89,19 +89,19 @@ Behold &Behold::operator<<(LogManip lm) {
     return *this;
 }
 
-Behold &Behold::operator<<(const std::string &s) {
+LogEntry &LogEntry::operator<<(const std::string &s) {
     m_line.push_back(s);
     return *this;
 }
 
-Behold &Behold::operator<<(const char *s) {
+LogEntry &LogEntry::operator<<(const char *s) {
     m_line.push_back(s);
     return *this;
 }
 
 #ifdef HAVE_MSGPACK
 
-Behold &Behold::operator<<(const msgpack::v1::type::raw_ref &raw) {
+LogEntry &LogEntry::operator<<(const msgpack::v1::type::raw_ref &raw) {
     std::stringstream s;
     s << "msgpack::raw<len=" << raw.size << ">";
     m_line.push_back(s.str());
@@ -111,7 +111,7 @@ Behold &Behold::operator<<(const msgpack::v1::type::raw_ref &raw) {
 #endif
 
 template <>
-Behold &Behold::operator<<(const std::vector<int> &v) {
+LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -127,14 +127,14 @@ Behold &Behold::operator<<(const std::vector<int> &v) {
         s << "]";
     }
     else {
-        s << "std::vector<len=" << v.size() << ">";
+        s << "std::vector<int>(len=" << v.size() << ")";
     }
     m_line.push_back(s.str());
     return *this;
 }
 
 template <>
-Behold &Behold::operator<<(const std::set<int> &s) {
+LogEntry &LogEntry::operator<<(const std::set<int> &s) {
     auto size = s.size();
     std::stringstream sstr;
     if (size < SET_MAX_SIZE) {
@@ -156,30 +156,30 @@ Behold &Behold::operator<<(const std::set<int> &s) {
     return *this;
 }
 
-Behold Behold::devel(const char *lc) {
-    return Behold(LOG_DEVEL, lc);
+LogEntry Behold::devel(const char *lc) {
+    return LogEntry(LOG_DEVEL, lc);
 }
 
-Behold Behold::debug(const char *lc) {
-    return Behold(LOG_DEBUG, lc);
+LogEntry Behold::debug(const char *lc) {
+    return LogEntry(LOG_DEBUG, lc);
 }
 
-Behold Behold::info(const char *lc) {
-    return Behold(LOG_INFO, lc);
+LogEntry Behold::info(const char *lc) {
+    return LogEntry(LOG_INFO, lc);
 }
 
-Behold Behold::warning(const char *lc) {
-    return Behold(LOG_WARNING, lc);
+LogEntry Behold::warning(const char *lc) {
+    return LogEntry(LOG_WARNING, lc);
 }
 
-Behold Behold::error(const char *lc) {
-    return Behold(LOG_ERROR, lc);
+LogEntry Behold::error(const char *lc) {
+    return LogEntry(LOG_ERROR, lc);
 }
 
-Behold Behold::critical(const char *lc) {
-    return Behold(LOG_CRITICAL, lc);
+LogEntry Behold::critical(const char *lc) {
+    return LogEntry(LOG_CRITICAL, lc);
 }
 
-Behold Behold::fatal(const char *lc) {
-    return Behold(LOG_FATAL, lc);
+LogEntry Behold::fatal(const char *lc) {
+    return LogEntry(LOG_FATAL, lc);
 }

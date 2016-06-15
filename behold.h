@@ -39,10 +39,10 @@
 
 
 #define MAKE_LOGGABLE(...) \
-    void to_behold(Behold &l) const { \
+    void to_logger(LogEntry &l) const { \
         l << typeid(*this).name() \
           << LogManip::NO_SPACE << "(" << LogManip::NO_SPACE; \
-        LogHelper(l).to_behold(__VA_ARGS__); \
+        LogHelper(l).to_logger(__VA_ARGS__); \
         l << LogManip::NO_SPACE << ")" ; \
     } \
 
@@ -61,28 +61,19 @@ enum LogLevel {
 } ;
 
 
-class Behold {
-public:
-    explicit Behold(LogLevel l=LOG_DEVEL, const char *lc="");
+struct LogEntry {
+    explicit LogEntry(LogLevel l=LOG_DEVEL, const char *lc="");
 
-    static Behold devel(const char *lc);
-    static Behold debug(const char *lc);
-    static Behold info(const char *lc);
-    static Behold warning(const char *lc);
-    static Behold error(const char *lc);
-    static Behold critical(const char *lc);
-    static Behold fatal(const char *lc);
-
-    Behold &operator<<(LogManip lm);
-    Behold &operator<<(const std::string &s);
-    Behold &operator<<(const char *s);
+    LogEntry &operator<<(LogManip lm);
+    LogEntry &operator<<(const std::string &s);
+    LogEntry &operator<<(const char *s);
 
     #ifdef HAVE_MSGPACK
-    Behold &operator<<(const msgpack::v1::type::raw_ref &raw);
+    LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw);
     #endif
 
     template <typename T>
-    Behold &operator <<(const std::vector<T> &v) {
+    LogEntry &operator <<(const std::vector<T> &v) {
         std::stringstream s;
         s << "std::vector<len=" << v.size() << ">";
         m_line.push_back(s.str());
@@ -90,15 +81,15 @@ public:
     }
 
     template <typename T>
-    Behold &operator <<(const std::set<T> &s) {
+    LogEntry &operator <<(const std::set<T> &s) {
         std::stringstream sstr;
-        s << "std::set<len=" << s.size() << ">";
+        sstr << "std::set<len=" << s.size() << ">";
         m_line.push_back(sstr.str());
         return *this;
     }
 
     template <typename K, typename V>
-    Behold &operator <<(const std::map<K, V> &m) {
+    LogEntry &operator <<(const std::map<K, V> &m) {
         std::stringstream s;
         s << "Map<len=" << m.size() << ">";
         m_line.push_back(s.str());
@@ -106,7 +97,7 @@ public:
     }
 
     template <typename T>
-    typename std::enable_if<std::is_arithmetic<T>::value, Behold &>::type
+    typename std::enable_if<std::is_arithmetic<T>::value, LogEntry &>::type
     operator<<(T t) {
         std::stringstream s;
         s << t;
@@ -115,14 +106,14 @@ public:
     }
 
     template <typename T>
-    typename std::enable_if<std::is_class<T>::value, Behold &>::type
+    typename std::enable_if<std::is_class<T>::value, LogEntry &>::type
     operator<<(const T &t) {
-        t.to_behold(*this);
+        t.to_logger(*this);
         return *this;
     }
 
     template <typename T>
-    typename std::enable_if<std::is_enum<T>::value, Behold &>::type
+    typename std::enable_if<std::is_enum<T>::value, LogEntry &>::type
     operator<<(const T &t) {
         std::stringstream s;
         s << t;
@@ -130,7 +121,7 @@ public:
         return *this;
     }
 
-    ~Behold();
+    ~LogEntry();
 
 private:
     static const int SET_MAX_SIZE = 5;
@@ -148,19 +139,30 @@ private:
 
 // we need this because of trailing comma issue with __VA_ARGS__
 struct LogHelper {
-    Behold &behold;
-    explicit LogHelper(Behold &l): behold(l) { }
+    LogEntry &behold;
+    explicit LogHelper(LogEntry &l): behold(l) { }
 
-    inline void to_behold() { }
+    inline void to_logger() { }
 
     template<typename First>
-    void to_behold(First && first) {
+    void to_logger(First && first) {
         behold << std::forward<First>(first);
     }
 
     template<typename First, typename ...Rest>
-    void to_behold(First && first, Rest && ...rest) {
+    void to_logger(First && first, Rest && ...rest) {
         behold << std::forward<First>(first) << LogManip::NO_SPACE << ",";
-        to_behold(std::forward<Rest>(rest)...);
+        to_logger(std::forward<Rest>(rest)...);
     }
+};
+
+//template <typename T>
+struct Behold {
+    static LogEntry devel(const char *lc);
+    static LogEntry debug(const char *lc);
+    static LogEntry info(const char *lc);
+    static LogEntry warning(const char *lc);
+    static LogEntry error(const char *lc);
+    static LogEntry critical(const char *lc);
+    static LogEntry fatal(const char *lc);
 };

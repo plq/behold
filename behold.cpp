@@ -58,7 +58,7 @@ Behold::Behold(LogLevel l, const char *lc): m_level(l) {
 }
 
 Behold::~Behold() {
-    s_mutex.lock();
+    std::lock_guard<std::mutex> guard(s_mutex);
 
     auto b = m_no_space_indexes.cbegin();
     auto e = m_no_space_indexes.cend();
@@ -73,9 +73,8 @@ Behold::~Behold() {
 
         ++i;
     }
-    std::cout << std::endl;
 
-    s_mutex.unlock();
+    std::cout << std::endl;
 }
 
 Behold &Behold::operator<<(LogManip lm) {

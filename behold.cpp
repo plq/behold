@@ -53,7 +53,7 @@ Behold::Behold(LogLevel l, const char *lc): m_level(l) {
         m_line.push_back("?");
     }
 
-    *this << time(NULL) << LogManip::NO_SPACE << ":";    
+    *this << time(NULL) << LogManip::NO_SPACE << ":";
     *this << lc << "|";
 }
 

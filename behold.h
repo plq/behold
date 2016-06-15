@@ -64,7 +64,7 @@ enum LogLevel {
 class Behold {
 public:
     explicit Behold(LogLevel l=LOG_DEVEL, const char *lc="");
-    
+
     static Behold devel(const char *lc);
     static Behold debug(const char *lc);
     static Behold info(const char *lc);
@@ -132,7 +132,7 @@ public:
 
     ~Behold();
 
-private:    
+private:
     static const int SET_MAX_SIZE = 5;
     static const int VECTOR_MAX_SIZE = 5;
 

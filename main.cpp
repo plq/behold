@@ -37,6 +37,9 @@ struct NotLoggable {
     const char *b;
 };
 
+// another way of using the logger;
+using Witness = Behold(std::cerr);
+
 int main(int, char **) {
     std::set<int> si = {4, 3, 2, 1};
     std::vector<int> vi = {1, 2, 3, 4};
@@ -55,16 +58,18 @@ int main(int, char **) {
 
 #endif
 
-    Behold::info(LC) << "A std::set<int>:" << si;
-    Behold::info(LC) << "A std::vector<int>:" << vi;
-    Behold::debug(LC) << "A std::vector<std::string>:" << vs;
-    Behold::error(LC) << "A loggable class:" << l;
-    Behold::critical(LC) << "A string:" << raw;
-    Behold::devel(LC) << "Some numbers with no spaces:"
+    Behold(std::cout)::info(LC) << "A std::set<int>:" << si;
+    Behold(std::cout)::info(LC) << "A std::vector<int>:" << vi;
+    Behold(std::cout)::debug(LC) << "A std::vector<std::string>:" << vs;
+    Behold(std::cout)::error(LC) << "A loggable class:" << l;
+    Behold(std::cout)::critical(LC) << "A string:" << raw;
+    Behold(std::cout)::devel(LC) << "Some numbers without spaces:"
         << 5 << LogManip::NO_SPACE
         << 6 << LogManip::NO_SPACE
         << 7 << LogManip::NO_SPACE
         << 8 << LogManip::NO_SPACE;
+
+    Witness::info(LC) << "This goes to stderr";
 
     return 0;
 }

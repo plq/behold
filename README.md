@@ -1,3 +1,3 @@
 # Behold
 
-An awesome C++11 logger.
+An awesome C++1y logger.

@@ -25,93 +25,10 @@
 
 #include <behold.h>
 
-std::mutex LogEntry::s_mutex;
 
-LogEntry::LogEntry(LogLevel l, const char *lc): m_level(l) {
-    if (m_level <= LOG_DEVEL) {
-        m_line.push_back("d");
-    }
-    else if (m_level <= LOG_DEBUG) {
-        m_line.push_back("D");
-    }
-    else if (m_level <= LOG_INFO) {
-        m_line.push_back("I");
-    }
-    else if (m_level <= LOG_WARNING) {
-        m_line.push_back("W");
-    }
-    else if (m_level <= LOG_ERROR) {
-        m_line.push_back("E");
-    }
-    else if (m_level <= LOG_CRITICAL) {
-        m_line.push_back("C");
-    }
-    else if (m_level <= LOG_FATAL) {
-        m_line.push_back("F");
-    }
-    else {
-        m_line.push_back("?");
-    }
-
-    *this << time(NULL) << LogManip::NO_SPACE << ":";
-    *this << lc << "|";
-}
-
-LogEntry::~LogEntry() {
-    std::lock_guard<std::mutex> guard(s_mutex);
-
-    auto b = m_no_space_indexes.cbegin();
-    auto e = m_no_space_indexes.cend();
-    auto i = b + 1;
-    for (auto &s: m_line) {
-        std::cout << s;
-
-        auto has_nosp = (i < e && (*i));
-        if (! has_nosp) {
-            std::cout << " ";
-        }
-
-        ++i;
-    }
-
-    std::cout << std::endl;
-}
-
-LogEntry &LogEntry::operator<<(LogManip lm) {
-    switch (lm) {
-    case LogManip::NO_SPACE:
-        auto s = m_line.size();
-        m_no_space_indexes.resize(s + 1, false);
-        m_no_space_indexes[s] = true;
-        break;
-    }
-
-    return *this;
-}
-
-LogEntry &LogEntry::operator<<(const std::string &s) {
-    m_line.push_back(s);
-    return *this;
-}
-
-LogEntry &LogEntry::operator<<(const char *s) {
-    m_line.push_back(s);
-    return *this;
-}
-
-#ifdef HAVE_MSGPACK
-
-LogEntry &LogEntry::operator<<(const msgpack::v1::type::raw_ref &raw) {
-    std::stringstream s;
-    s << "msgpack::raw<len=" << raw.size << ">";
-    m_line.push_back(s.str());
-    return *this;
-}
-
-#endif
-
+/*
 template <>
-LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
+LogEntry<T> &LogEntry<T>::operator<<(const std::vector<int> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -134,7 +51,7 @@ LogEntry &LogEntry::operator<<(const std::vector<int> &v) {
 }
 
 template <>
-LogEntry &LogEntry::operator<<(const std::vector<std::string> &v) {
+LogEntry &LogEntry<T>::operator<<(const std::vector<std::string> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -157,7 +74,7 @@ LogEntry &LogEntry::operator<<(const std::vector<std::string> &v) {
 }
 
 template <>
-LogEntry &LogEntry::operator<<(const std::set<int> &s) {
+LogEntry &LogEntry<T>::operator<<(const std::set<int> &s) {
     auto size = s.size();
     std::stringstream sstr;
     if (size < SET_MAX_SIZE) {
@@ -178,31 +95,4 @@ LogEntry &LogEntry::operator<<(const std::set<int> &s) {
     m_line.push_back(sstr.str());
     return *this;
 }
-
-LogEntry Behold::devel(const char *lc) {
-    return LogEntry(LOG_DEVEL, lc);
-}
-
-LogEntry Behold::debug(const char *lc) {
-    return LogEntry(LOG_DEBUG, lc);
-}
-
-LogEntry Behold::info(const char *lc) {
-    return LogEntry(LOG_INFO, lc);
-}
-
-LogEntry Behold::warning(const char *lc) {
-    return LogEntry(LOG_WARNING, lc);
-}
-
-LogEntry Behold::error(const char *lc) {
-    return LogEntry(LOG_ERROR, lc);
-}
-
-LogEntry Behold::critical(const char *lc) {
-    return LogEntry(LOG_CRITICAL, lc);
-}
-
-LogEntry Behold::fatal(const char *lc) {
-    return LogEntry(LOG_FATAL, lc);
-}
+*/

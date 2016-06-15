@@ -38,6 +38,7 @@ struct NotLoggable {
 };
 
 int main(int, char **) {
+    std::set<int> si = {4, 3, 2, 1};
     std::vector<int> vi = {1, 2, 3, 4};
     std::vector<std::string> vs = {"a", "b", "c"};
     Loggable l;
@@ -54,6 +55,7 @@ int main(int, char **) {
 
 #endif
 
+    Behold::info(LC) << "A std::set<int>:" << si;
     Behold::info(LC) << "A std::vector<int>:" << vi;
     Behold::debug(LC) << "A std::vector<std::string>:" << vs;
     Behold::error(LC) << "A loggable class:" << l;

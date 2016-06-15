@@ -271,8 +271,11 @@ struct Logger {
     static LogEntry<S, out> devel(const char *lc);
     static LogEntry<S, out> debug(const char *lc);
     static LogEntry<S, out> info(const char *lc);
+    static LogEntry<S, out> warn(const char *lc);
     static LogEntry<S, out> warning(const char *lc);
+    static LogEntry<S, out> err(const char *lc);
     static LogEntry<S, out> error(const char *lc);
+    static LogEntry<S, out> crit(const char *lc);
     static LogEntry<S, out> critical(const char *lc);
     static LogEntry<S, out> fatal(const char *lc);
 };
@@ -293,6 +296,9 @@ LogEntry<S, out> Logger<S, out, f>::info(const char *lc) {
     return LogEntry<S, out>(LOG_INFO, lc, f);
 }
 
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::warn(const char *lc) {
+    return LogEntry<S, out>(LOG_WARNING, lc, f);
 }
 
 template <typename S, S &out, bool f>
@@ -300,11 +306,19 @@ LogEntry<S, out> Logger<S, out, f>::warning(const char *lc) {
     return LogEntry<S, out>(LOG_WARNING, lc, f);
 }
 
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::err(const char *lc) {
+    return LogEntry<S, out>(LOG_ERROR, lc, f);
 }
 
 template <typename S, S &out, bool f>
 LogEntry<S, out> Logger<S, out, f>::error(const char *lc) {
     return LogEntry<S, out>(LOG_ERROR, lc, f);
+}
+
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::crit(const char *lc) {
+    return LogEntry<S, out>(LOG_CRITICAL, lc, f);
 }
 
 template <typename S, S &out, bool f>

@@ -65,7 +65,8 @@ enum LogLevel {
 
 template<typename S, S &out>
 struct LogEntry {
-    explicit LogEntry(LogLevel l=LOG_DEVEL, const char *lc="");
+    time_t t;
+    explicit LogEntry(LogLevel l=LOG_DEVEL, const char *lc="", bool log_time=true);
 
     LogEntry &operator<<(LogManip lm);
     LogEntry &operator<<(const std::string &);
@@ -162,12 +163,12 @@ struct LogHelper {
 
 
 
-
 template <typename S, S &out>
 std::mutex LogEntry<S, out>::s_mutex;
 
+
 template <typename S, S &out>
-LogEntry<S, out>::LogEntry(LogLevel l, const char *lc): m_level(l) {
+LogEntry<S, out>::LogEntry(LogLevel l, const char *lc, bool log_time): t(time(NULL)), m_level(l) {
     if (m_level <= LOG_DEVEL) {
         m_line.push_back("d");
     }
@@ -193,17 +194,24 @@ LogEntry<S, out>::LogEntry(LogLevel l, const char *lc): m_level(l) {
         m_line.push_back("?");
     }
 
-    *this << time(NULL) << LogManip::NO_SPACE << ":";
+    if (log_time) {
+        *this << t;
+    }
+
     *this << lc << "|";
 }
 
 template <typename S, S &out>
 LogEntry<S, out>::~LogEntry() {
-    std::lock_guard<std::mutex> guard(s_mutex);
+    if (m_line.empty()) {
+        return;
+    }
 
     auto b = m_no_space_indexes.cbegin();
-    auto e = m_no_space_indexes.cend();
+    auto e = m_no_space_indexes.back(); // because we want no trailing space
     auto i = b + 1;
+
+    std::lock_guard<std::mutex> guard(s_mutex);
     for (auto &s: m_line) {
         out << s;
 
@@ -258,10 +266,7 @@ LogEntry<S, out> &LogEntry<S, out>::operator<<(const msgpack::v1::type::raw_ref 
 #endif
 
 
-
-
-
-template <typename S, S &out>
+template <typename S, S &out, bool f>
 struct Logger {
     static LogEntry<S, out> devel(const char *lc);
     static LogEntry<S, out> debug(const char *lc);
@@ -273,41 +278,43 @@ struct Logger {
 };
 
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::devel(const char *lc) {
-    return LogEntry<S, out>(LOG_DEVEL, lc);
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::devel(const char *lc) {
+    return LogEntry<S, out>(LOG_DEVEL, lc, f);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::debug(const char *lc) {
-    return LogEntry<S, out>(LOG_DEBUG, lc);
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::debug(const char *lc) {
+    return LogEntry<S, out>(LOG_DEBUG, lc, f);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::info(const char *lc) {
-    return LogEntry<S, out>(LOG_INFO, lc);
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::info(const char *lc) {
+    return LogEntry<S, out>(LOG_INFO, lc, f);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::warning(const char *lc) {
-    return LogEntry<S, out>(LOG_WARNING, lc);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::error(const char *lc) {
-    return LogEntry<S, out>(LOG_ERROR, lc);
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::warning(const char *lc) {
+    return LogEntry<S, out>(LOG_WARNING, lc, f);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::critical(const char *lc) {
-    return LogEntry<S, out>(LOG_CRITICAL, lc);
 }
 
-template <typename S, S &out>
-LogEntry<S, out> Logger<S, out>::fatal(const char *lc) {
-    return LogEntry<S, out>(LOG_FATAL, lc);
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::error(const char *lc) {
+    return LogEntry<S, out>(LOG_ERROR, lc, f);
 }
 
-#define Behold(X) Logger<decltype(X), X>
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::critical(const char *lc) {
+    return LogEntry<S, out>(LOG_CRITICAL, lc, f);
+}
 
-using BeholdCout = Logger<decltype(std::cout), std::cout>;
+template <typename S, S &out, bool f>
+LogEntry<S, out> Logger<S, out, f>::fatal(const char *lc) {
+    return LogEntry<S, out>(LOG_FATAL, lc, f);
+}
+
+#define Behold(X) Logger<decltype(X), X, true>

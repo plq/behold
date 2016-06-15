@@ -48,7 +48,9 @@
     } \
 
 
-enum class LogManip {NO_SPACE};
+enum class LogManip {
+    NO_SPACE,
+};
 
 
 enum LogLevel {
@@ -219,11 +221,13 @@ LogEntry<S, out>::~LogEntry() {
 template <typename S, S &out>
 LogEntry<S, out> &LogEntry<S, out>::operator<<(LogManip lm) {
     switch (lm) {
-    case LogManip::NO_SPACE:
+    case LogManip::NO_SPACE: {
         auto s = m_line.size();
         m_no_space_indexes.resize(s + 1, false);
         m_no_space_indexes[s] = true;
         break;
+    }
+
     }
 
     return *this;

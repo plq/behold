@@ -17,6 +17,21 @@ void test_const_char() {
     assert_equal(ret, "Test");
 }
 
+void test_format_with_time() {
+    time_t t;
+    {
+        auto log = Logger<decltype(ss_test), ss_test, true>::devel(__FUNCTION__);
+        log << "Test";
+
+        t = log.t;
+    }
+
+
+    auto ret = ss_test.str();
+
+    assert_equal(ret, std::string("d ") + std::to_string(t) +  __FUNCTION__ + " | Test\n");
+}
+
 void test_format_remove_header() {
     TestLog::devel(__FUNCTION__) << "Test";
     auto ret = ss_test.str();
@@ -52,6 +67,7 @@ static std::vector<std::function<void()>> tests = {
     test_nosp_2,
     test_integer,
     test_const_char,
+    test_format_with_time,
     test_format_remove_header,
 };
 

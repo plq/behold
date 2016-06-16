@@ -14,37 +14,37 @@ void test_const_char() {
     auto ret = remove_header(ss_test.str());
     StatusLog::devel(LC) << escape(ret);
 
-    myassert(ret == "Test");
+    assert_equal(ret, "Test");
 }
 
 void test_remove_header() {
     TestLog::devel(__FUNCTION__) << "Test";
     auto ret = ss_test.str();
-    myassert(ret == std::string("d ") + __FUNCTION__ + " | Test\n");
+    assert_equal(ret, std::string("d ") + __FUNCTION__ + " | Test\n");
 
     ret = remove_header(ret);
-    myassert(ret == "Test");
+    assert_equal(ret, "Test");
 }
 
 void test_integer() {
     TestLog::devel(__FUNCTION__) << 1;
     auto ret = remove_header(ss_test.str());
 
-    myassert(ret == "1");
+    assert_equal(ret, "1");
 }
 
 void test_nosp_1() {
     TestLog::devel(__FUNCTION__) << 1 << LogManip::NO_SPACE << 2;
     auto ret = remove_header(ss_test.str());
 
-    myassert(ret == "12");
+    assert_equal(ret, "12");
 }
 
 void test_nosp_2() {
     TestLog::devel(__FUNCTION__) << LogManip::NO_SPACE << 1 << 2;
     auto ret = remove_header(ss_test.str());
 
-    myassert(ret == "1 2");
+    assert_equal(ret, "1 2");
 }
 
 static std::vector<std::function<void()>> tests = {

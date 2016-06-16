@@ -8,18 +8,39 @@
 #include <stdexcept>
 #include <functional>
 
-class OhGodException: public std::runtime_error {
-std::string remove_header(const std::string &s);
-
-public:
-    OhGodException(const std::string &s="silly you") : std::runtime_error(s) { }
-};
-
-void myassert(bool cond);
+#include <behold.h>
 
 std::string escape(const char *str, size_t s);
 
 std::string escape(const std::string &s);
+
+std::string remove_header(const std::string &s);
+
+
+template<typename X, typename Y>
+class NotEqualsError: public std::runtime_error {
+public:
+    static std::stringstream ss;
+    std::string s;
+    NotEqualsError(const X &x, const Y &y) : std::runtime_error("") { 
+        Logger<decltype(ss), ss, false>::error("TFWR") << x << "!=" << y;
+        s = ss.str();
+    }
+    virtual const char *what() const throw() override {
+        return s.c_str();
+    }
+};
+
+template<typename X, typename Y>
+std::stringstream NotEqualsError<X,Y>::ss;
+
+
+template <typename X, typename Y>
+void assert_equal(const X &x, const Y &y) {
+    if (x != y) {
+        throw NotEqualsError<X, Y>(x, y);
+    }
+}
 
 extern std::stringstream ss_test;
 extern std::stringstream ss_status;
@@ -42,7 +63,7 @@ int run_tests(std::vector<std::function<void()>> &tests) {
             f();
             cout << "." << flush;
         }
-        catch (OhGodException &e) {
+        catch (std::runtime_error &e) {
             std::stringstream fr; // failure_report
 
             fr << "\nFailed test " << ++idx << ":\n"

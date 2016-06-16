@@ -4,12 +4,6 @@
 std::stringstream ss_test;
 std::stringstream ss_status;
 
-void myassert(bool cond) {
-    if (! cond) {
-        throw OhGodException();
-    }
-}
-
 // FIXME: eww
 std::string escape(const char *str, size_t s) {
     std::string retval="\"";

@@ -29,7 +29,6 @@ void test_format_with_time() {
         t = log.t;
     }
 
-
     auto ret = ss_test.str();
 
     assert_equal(ret, std::string("d ") + std::to_string(t) +  __FUNCTION__ + " | Test\n");
@@ -87,12 +86,8 @@ void tear_down() {
 }
 
 struct TestContext {
-    TestContext() {
-        set_up();
-    }
-    ~TestContext() {
-        tear_down();
-    }
+    TestContext() { set_up(); }
+    ~TestContext() { tear_down(); }
 };
 
 int main(int, char **) {

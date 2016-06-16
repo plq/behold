@@ -9,6 +9,8 @@
 #include <functional>
 
 class OhGodException: public std::runtime_error {
+std::string remove_header(const std::string &s);
+
 public:
     OhGodException(const std::string &s="silly you") : std::runtime_error(s) { }
 };

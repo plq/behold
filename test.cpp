@@ -9,11 +9,6 @@ static const char *LC = "TEST";
 using TestLog = Logger<decltype(ss_test), ss_test, false>;
 using StatusLog = Logger<decltype(ss_status), ss_status, true>;
 
-std::string remove_header(std::string s) {
-    auto ret = s.substr(s.find_first_of("|") + 2);
-    return ret.substr(0, ret.size() - 1);
-}
-
 void test_const_char() {
     TestLog::devel(__FUNCTION__) << "Test";
     auto ret = remove_header(ss_test.str());

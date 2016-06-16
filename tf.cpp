@@ -43,3 +43,8 @@ std::string escape(const char *str, size_t s) {
 std::string escape(const std::string &s) {
     return escape(s.c_str(), s.size());
 }
+
+std::string remove_header(const std::string &s) {
+    auto ret = s.substr(s.find_first_of("|") + 2);
+    return ret.substr(0, ret.size() - 1);
+}

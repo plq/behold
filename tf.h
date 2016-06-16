@@ -66,7 +66,7 @@ int run_tests(std::vector<std::function<void()>> &tests) {
         catch (std::runtime_error &e) {
             std::stringstream fr; // failure_report
 
-            fr << "\nFailed test " << ++idx << ":\n"
+            fr << "\nFailed test " << idx << ":\n"
                <<   "==============\n";
             if (ss_status.str().empty()) {
                 fr << "StatusLog is empty.\n";
@@ -92,6 +92,8 @@ int run_tests(std::vector<std::function<void()>> &tests) {
             failed.push_back(fr.str());
             cout << "F" << flush;
         }
+
+        ++idx;
     }
 
     cout << "\n";

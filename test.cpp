@@ -31,7 +31,7 @@ void test_format_with_time() {
 
     auto ret = ss_test.str();
 
-    assert_equal(ret, std::string("d ") + std::to_string(t) +  __FUNCTION__ + " | Test\n");
+    assert_equal(ret, std::string("d ") + std::to_string(t) + " " + __FUNCTION__ + " | Test\n");
 }
 
 void test_format_remove_header() {
@@ -48,6 +48,27 @@ void test_integer() {
     auto ret = remove_header(ss_test.str());
 
     assert_equal(ret, "1");
+}
+
+void test_vector_int() {
+    TestLog::devel(__FUNCTION__) << std::vector<int>({1, 2, 3});
+    auto ret = remove_header(ss_test.str());
+
+    assert_equal(ret, "[1, 2, 3]");
+}
+
+void test_vector_string() {
+    TestLog::devel(__FUNCTION__) << std::vector<std::string>({"a", "b"});
+    auto ret = remove_header(ss_test.str());
+
+    assert_equal(ret, "[\"a\", \"b\"]");
+}
+
+void test_set_int() {
+    TestLog::devel(__FUNCTION__) << std::set<int>({4, 3, 6, 5});
+    auto ret = remove_header(ss_test.str());
+
+    assert_equal(ret, "{3, 4, 5, 6}"); // std::set orders stuff
 }
 
 void test_nosp_1() {
@@ -69,6 +90,12 @@ static std::vector<std::function<void()>> tests = {
     test_nosp_2,
     test_integer,
     test_const_char,
+
+    test_set_int,
+
+    test_vector_int,
+    test_vector_string,
+
     test_format_with_time,
     test_format_remove_header,
 };

@@ -73,6 +73,9 @@ struct LogEntry {
     LogEntry &operator<<(LogManip lm);
     LogEntry &operator<<(const std::string &);
     LogEntry &operator<<(const char *);
+    LogEntry &operator<<(const std::vector<int> &);
+    LogEntry &operator<<(const std::vector<std::string> &);
+    LogEntry &operator<<(const std::set<int> &v);
 
     #ifdef HAVE_MSGPACK
     LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw);
@@ -340,6 +343,75 @@ LogEntry<S, out> Logger<S, out, f>::critical(const char *lc) {
 template <typename S, S &out, bool f>
 LogEntry<S, out> Logger<S, out, f>::fatal(const char *lc) {
     return LogEntry<S, out>(LOG_FATAL, lc, f);
+}
+
+template <typename S, S &out>
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<int> &v) {
+    auto size = v.size();
+    std::stringstream s;
+    if (size < VECTOR_MAX_SIZE) {
+        s << "[";
+
+        int i = 0;
+        for (const auto &t: v) {
+            if (i++ > 0) {
+                s << ", ";
+            }
+            s << t;
+        }
+        s << "]";
+    }
+    else {
+        s << "std::vector<int>(len=" << v.size() << ")";
+    }
+    m_line.push_back(s.str());
+    return *this;
+}
+
+template <typename S, S &out>
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<std::string> &v) {
+    auto size = v.size();
+    std::stringstream s;
+    if (size < VECTOR_MAX_SIZE) {
+        s << "[";
+
+        int i = 0;
+        for (const auto &t: v) {
+            if (i++ > 0) {
+                s << ", ";
+            }
+            s << "\"" << t << "\"";
+        }
+        s << "]";
+    }
+    else {
+        s << "std::vector<std::string>(len=" << v.size() << ")";
+    }
+    m_line.push_back(s.str());
+    return *this;
+}
+
+template <typename S, S &out>
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::set<int> &s) {
+    auto size = s.size();
+    std::stringstream sstr;
+    if (size < SET_MAX_SIZE) {
+        sstr << "{";
+
+        int i = 0;
+        for (const auto &t: s) {
+            if (i++ > 0) {
+                sstr << ", ";
+            }
+            sstr << t;
+        }
+        sstr << "}";
+    }
+    else {
+        sstr << "std::set<len=" << s.size() << ">";
+    }
+    m_line.push_back(sstr.str());
+    return *this;
 }
 
 #define Behold(X) Logger<decltype(X), X, true>

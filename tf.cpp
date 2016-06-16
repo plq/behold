@@ -39,7 +39,7 @@ std::string escape(const std::string &s) {
 }
 
 template<>
-NotEqualError<std::string, std::string>::NotEqualError(const std::string &x, const std::string &y): std::runtime_error("") {
+EqualityError<std::string, std::string>::EqualityError(const std::string &x, const std::string &y): std::runtime_error("") {
     Logger<decltype(ss), ss, false>::error("TFWR") << escape(x) << "!=" << escape(y);
     s = ss.str();
 }

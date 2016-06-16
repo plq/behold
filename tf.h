@@ -18,11 +18,11 @@ std::string remove_header(const std::string &s);
 
 
 template<typename X, typename Y>
-class NotEqualError: public std::runtime_error {
+class EqualityError: public std::runtime_error {
 public:
     static std::stringstream ss;
     std::string s;
-    NotEqualError(const X &x, const Y &y) : std::runtime_error("") {
+    EqualityError(const X &x, const Y &y) : std::runtime_error("") {
         Logger<decltype(ss), ss, false>::error("TFWR") << x << "!=" << y;
         s = ss.str();
     }
@@ -32,13 +32,20 @@ public:
 };
 
 template<typename X, typename Y>
-std::stringstream NotEqualError<X, Y>::ss;
+std::stringstream EqualityError<X, Y>::ss;
 
 
 template <typename X, typename Y>
 void assert_equal(const X &x, const Y &y) {
     if (x != y) {
-        throw NotEqualError<X, Y>(x, y);
+        throw EqualityError<X, Y>(x, y);
+    }
+}
+
+template <typename X, typename Y>
+void assert_not_equal(const X &x, const Y &y) {
+    if (x == y) {
+        throw EqualityError<X, Y>(x, y);
     }
 }
 

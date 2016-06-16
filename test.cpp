@@ -1,31 +1,30 @@
 
-static const char *LC = "TEST";
+#include<stdexcept>
 
-#include<cassert>
 #include<behold.h>
+#include<tf.h>
 
-extern std::stringstream ss;
+using TestLog = Logger<decltype(ss_test), ss_test, false>;
+using StatusLog = Logger<decltype(ss_status), ss_status, true>;
 
-std::stringstream ss;
 
-using TestLog = Logger<decltype(ss), ss, false>;
+void test_const_char() {
+    TestLog::devel(__FUNCTION__) << "Test";
+    auto ret = ss_test.str();
 
-// Define user defined literal "_quoted" operator.
-std::string quote(const std::string &text) {
-    return "\"" + text + "\"";
+    myassert(ret == "d TCTX | Test\n");
 }
 
-void test_spaces() {
-    TestLog::devel("TCTX") << "Falan";
-    auto ret = ss.str();
+void test_integer() {
+    TestLog::devel(__FUNCTION__) << 1;
+    auto ret = ss_test.str();
 
-    Behold(std::cerr)::info(LC) << "Log line:" << quote(ret);
-
-    assert(ret == "d TCTX | Falan \n");
+    myassert(ret == "d TCTX | Falan\n");
 }
 
 static std::vector<std::function<void()>> tests = {
-    test_spaces,
+    test_const_char,
+    test_integer,
 };
 
 void set_up() {
@@ -33,15 +32,22 @@ void set_up() {
 }
 
 void tear_down() {
-    ss.clear();
+    ss_test.str(std::string());
+    ss_test.clear();
+
+    ss_status.str(std::string());
+    ss_status.clear();
 }
 
-int main(int, char **) {
-
-    for (auto &f: tests) {
+struct TestContext {
+    TestContext() {
         set_up();
-        f();
+    }
+    ~TestContext() {
         tear_down();
     }
-    return 0;
+};
+
+int main(int, char **) {
+    return run_tests<TestContext>(tests);
 }

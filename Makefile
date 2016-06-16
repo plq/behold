@@ -24,5 +24,8 @@ clean:
 test.o: behold.h test.cpp
 	$(CXX) -c test.cpp -o test.o $(CXXFLAGS)
 
-test: behold.o test.o
-	$(CXX) test.o behold.o -o test
+tf.o: tf.cpp tf.h
+	$(CXX) -c tf.cpp -o tf.o $(CXXFLAGS)
+
+test: behold.o test.o tf.o
+	$(CXX) test.o behold.o tf.o -o test

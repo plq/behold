@@ -1,3 +1,5 @@
+#ifndef BEHOLD_BEHOLD_H
+#define BEHOLD_BEHOLD_H
 
 /*
  * The MIT License (MIT)
@@ -341,3 +343,5 @@ LogEntry<S, out> Logger<S, out, f>::fatal(const char *lc) {
 }
 
 #define Behold(X) Logger<decltype(X), X, true>
+
+#endif

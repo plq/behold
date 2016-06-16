@@ -1,3 +1,5 @@
+#ifndef BEHOLD_TF_H
+#define BEHOLD_TF_H
 
 #include <vector>
 #include <string>
@@ -83,3 +85,5 @@ int run_tests(std::vector<std::function<void()>> &tests) {
 
     return failed.size();
 }
+
+#endif

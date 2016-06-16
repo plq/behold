@@ -22,7 +22,7 @@ class NotEqualError: public std::runtime_error {
 public:
     static std::stringstream ss;
     std::string s;
-    NotEqualError(const X &x, const Y &y) : std::runtime_error("") { 
+    NotEqualError(const X &x, const Y &y) : std::runtime_error("") {
         Logger<decltype(ss), ss, false>::error("TFWR") << x << "!=" << y;
         s = ss.str();
     }
@@ -32,7 +32,7 @@ public:
 };
 
 template<typename X, typename Y>
-std::stringstream NotEqualError<X,Y>::ss;
+std::stringstream NotEqualError<X, Y>::ss;
 
 
 template <typename X, typename Y>

@@ -67,6 +67,9 @@ enum LogLevel {
 
 template<typename S, S &out>
 struct LogEntry {
+    static const int SET_MAX_SIZE = 5;
+    static const int VECTOR_MAX_SIZE = 5;
+
     time_t t;
     explicit LogEntry(LogLevel l=LOG_DEVEL, const char *lc="", bool log_time=true);
 
@@ -133,9 +136,6 @@ struct LogEntry {
     ~LogEntry();
 
 private:
-    static const int SET_MAX_SIZE = 5;
-    static const int VECTOR_MAX_SIZE = 5;
-
     static std::mutex s_mutex;
 
     std::vector<bool> m_no_space_indexes;
@@ -282,6 +282,9 @@ LogEntry<S, out> &LogEntry<S, out>::operator<<(const msgpack::v1::type::raw_ref 
 
 template <typename S, S &out, bool f>
 struct Logger {
+    static const auto VECTOR_MAX_SIZE = LogEntry<S, out>::VECTOR_MAX_SIZE;
+    static const auto SET_MAX_SIZE = LogEntry<S, out>::SET_MAX_SIZE;
+
     static LogEntry<S, out> devel(const char *lc);
     static LogEntry<S, out> debug(const char *lc);
     static LogEntry<S, out> info(const char *lc);

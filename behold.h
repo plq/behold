@@ -208,17 +208,17 @@ LogEntry<S, out>::~LogEntry() {
     }
 
     auto b = m_no_space_indexes.cbegin();
-    auto e = m_no_space_indexes.back(); // because we want no trailing space
-    auto i = b + 1;
+    auto e = m_no_space_indexes.cend();
+    auto i = b;
 
     std::lock_guard<std::mutex> guard(s_mutex);
     for (auto &s: m_line) {
-        out << s;
-
-        auto has_nosp = (i < e && (*i));
+        auto has_nosp = (i == b || (i < e && (*i)));
         if (! has_nosp) {
             out << " ";
         }
+
+        out << s;
 
         ++i;
     }

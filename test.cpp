@@ -1,10 +1,10 @@
 
 static const char *LC = "TEST";
 
-#include<stdexcept>
+#include <stdexcept>
 
-#include<behold.h>
-#include<tf.h>
+#include <behold.h>
+#include <tf.h>
 
 static const bool DO_LOG_TIME = true;
 static const bool DONT_LOG_TIME = false;
@@ -57,6 +57,26 @@ void test_vector_int() {
     assert_equal(ret, "[1, 2, 3]");
 }
 
+void test_vector_int_above_limit() {
+    auto v = std::vector<int>();
+    v.resize(TestLog::VECTOR_MAX_SIZE + 1, 0);
+
+    TestLog::devel(__FUNCTION__) << v;
+    auto ret = remove_header(ss_test.str());
+
+    assert_equal(ret, "std::vector<int>(len=" + std::to_string(v.size()) + ")");
+}
+
+void test_vector_int_limit() {
+    auto v = std::vector<int>();
+    v.resize(TestLog::VECTOR_MAX_SIZE, 0);
+
+    TestLog::devel(__FUNCTION__) << v;
+    auto ret = remove_header(ss_test.str());
+
+    assert_not_equal(ret, "std::vector<int>(len=" + std::to_string(v.size()) + ")");
+}
+
 void test_vector_string() {
     TestLog::devel(__FUNCTION__) << std::vector<std::string>({"a", "b"});
     auto ret = remove_header(ss_test.str());
@@ -93,8 +113,11 @@ static std::vector<std::function<void()>> tests = {
 
     test_set_int,
 
-    test_vector_int,
     test_vector_string,
+
+    test_vector_int,
+    test_vector_int_limit,
+    test_vector_int_above_limit,
 
     test_format_with_time,
     test_format_remove_header,

@@ -76,9 +76,9 @@ struct LogEntry {
     LogEntry &operator<<(LogManip lm);
     LogEntry &operator<<(const std::string &);
     LogEntry &operator<<(const char *);
+    LogEntry &operator<<(const std::set<int> &v);
     LogEntry &operator<<(const std::vector<int> &);
     LogEntry &operator<<(const std::vector<std::string> &);
-    LogEntry &operator<<(const std::set<int> &v);
 
     #ifdef HAVE_MSGPACK
     LogEntry &operator<<(const msgpack::v1::type::raw_ref &raw);
@@ -352,7 +352,10 @@ template <typename S, S &out>
 LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<int> &v) {
     auto size = v.size();
     std::stringstream s;
-    if (size < VECTOR_MAX_SIZE) {
+    if (size > VECTOR_MAX_SIZE) {
+        s << "std::vector<int>(len=" << v.size() << ")";
+    }
+    else {
         s << "[";
 
         int i = 0;
@@ -364,9 +367,6 @@ LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<int> &v) {
         }
         s << "]";
     }
-    else {
-        s << "std::vector<int>(len=" << v.size() << ")";
-    }
     m_line.push_back(s.str());
     return *this;
 }
@@ -375,7 +375,10 @@ template <typename S, S &out>
 LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<std::string> &v) {
     auto size = v.size();
     std::stringstream s;
-    if (size < VECTOR_MAX_SIZE) {
+    if (size > VECTOR_MAX_SIZE) {
+        s << "std::vector<std::string>(len=" << v.size() << ")";
+    }
+    else {
         s << "[";
 
         int i = 0;
@@ -387,9 +390,6 @@ LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<std::string> &v
         }
         s << "]";
     }
-    else {
-        s << "std::vector<std::string>(len=" << v.size() << ")";
-    }
     m_line.push_back(s.str());
     return *this;
 }
@@ -398,7 +398,10 @@ template <typename S, S &out>
 LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::set<int> &s) {
     auto size = s.size();
     std::stringstream sstr;
-    if (size < SET_MAX_SIZE) {
+    if (size > SET_MAX_SIZE) {
+        sstr << "std::set<len=" << s.size() << ">";
+    }
+    else {
         sstr << "{";
 
         int i = 0;
@@ -409,9 +412,6 @@ LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::set<int> &s) {
             sstr << t;
         }
         sstr << "}";
-    }
-    else {
-        sstr << "std::set<len=" << s.size() << ">";
     }
     m_line.push_back(sstr.str());
     return *this;

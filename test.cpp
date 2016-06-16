@@ -17,7 +17,7 @@ void test_const_char() {
     assert_equal(ret, "Test");
 }
 
-void test_remove_header() {
+void test_format_remove_header() {
     TestLog::devel(__FUNCTION__) << "Test";
     auto ret = ss_test.str();
     assert_equal(ret, std::string("d ") + __FUNCTION__ + " | Test\n");
@@ -52,7 +52,7 @@ static std::vector<std::function<void()>> tests = {
     test_nosp_2,
     test_integer,
     test_const_char,
-    test_remove_header,
+    test_format_remove_header,
 };
 
 void set_up() {

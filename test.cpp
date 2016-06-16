@@ -6,8 +6,11 @@ static const char *LC = "TEST";
 #include<behold.h>
 #include<tf.h>
 
-using TestLog = Logger<decltype(ss_test), ss_test, false>;
-using StatusLog = Logger<decltype(ss_status), ss_status, true>;
+static const bool DO_LOG_TIME = true;
+static const bool DONT_LOG_TIME = false;
+
+using TestLog = Logger<decltype(ss_test), ss_test, DONT_LOG_TIME>;
+using StatusLog = Logger<decltype(ss_status), ss_status, DO_LOG_TIME>;
 
 void test_const_char() {
     TestLog::devel(__FUNCTION__) << "Test";

@@ -10,7 +10,7 @@ HAVE_MSGPACK := $(shell echo "\#include<msgpack.hpp>" \
 all: behold test
 
 behold: main.o
-	$(CXX) main.o behold.o -o behold
+	$(CXX) main.o -o behold
 
 main.o: main.cpp behold.h
 	$(CXX) -c main.cpp -o main.o $(CXXFLAGS)
@@ -24,5 +24,5 @@ test.o: behold.h test.cpp tf.h tf.cpp
 tf.o: tf.cpp tf.h
 	$(CXX) -c tf.cpp -o tf.o $(CXXFLAGS)
 
-test: behold.o test.o tf.o
-	$(CXX) test.o behold.o tf.o -o test
+test: test.o tf.o
+	$(CXX) test.o tf.o -o test

@@ -25,10 +25,13 @@
 
 #include <behold.h>
 
-
 /*
-template <>
-LogEntry<T> &LogEntry<T>::operator<<(const std::vector<int> &v) {
+
+template <typename S, S &out>
+template<>
+//       ^
+// error: invalid explicit specialization before ‘>’ token
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<int> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -50,8 +53,9 @@ LogEntry<T> &LogEntry<T>::operator<<(const std::vector<int> &v) {
     return *this;
 }
 
-template <>
-LogEntry &LogEntry<T>::operator<<(const std::vector<std::string> &v) {
+template <typename S, S &out>
+template<>
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::vector<std::string> &v) {
     auto size = v.size();
     std::stringstream s;
     if (size < VECTOR_MAX_SIZE) {
@@ -73,8 +77,9 @@ LogEntry &LogEntry<T>::operator<<(const std::vector<std::string> &v) {
     return *this;
 }
 
-template <>
-LogEntry &LogEntry<T>::operator<<(const std::set<int> &s) {
+template <typename S, S &out>
+template<>
+LogEntry<S, out> &LogEntry<S, out>::operator<<(const std::set<int> &s) {
     auto size = s.size();
     std::stringstream sstr;
     if (size < SET_MAX_SIZE) {
@@ -95,4 +100,5 @@ LogEntry &LogEntry<T>::operator<<(const std::set<int> &s) {
     m_line.push_back(sstr.str());
     return *this;
 }
+
 */

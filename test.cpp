@@ -1,4 +1,6 @@
 
+static const char *LC = "TEST";
+
 #include<stdexcept>
 
 #include<behold.h>
@@ -7,24 +9,55 @@
 using TestLog = Logger<decltype(ss_test), ss_test, false>;
 using StatusLog = Logger<decltype(ss_status), ss_status, true>;
 
+std::string remove_header(std::string s) {
+    auto ret = s.substr(s.find_first_of("|") + 2);
+    return ret.substr(0, ret.size() - 1);
+}
 
 void test_const_char() {
     TestLog::devel(__FUNCTION__) << "Test";
-    auto ret = ss_test.str();
+    auto ret = remove_header(ss_test.str());
+    StatusLog::devel(LC) << escape(ret);
 
-    myassert(ret == "d TCTX | Test\n");
+    myassert(ret == "Test");
+}
+
+void test_remove_header() {
+    TestLog::devel(__FUNCTION__) << "Test";
+    auto ret = ss_test.str();
+    myassert(ret == std::string("d ") + __FUNCTION__ + " | Test\n");
+
+    ret = remove_header(ret);
+    myassert(ret == "Test");
 }
 
 void test_integer() {
     TestLog::devel(__FUNCTION__) << 1;
-    auto ret = ss_test.str();
+    auto ret = remove_header(ss_test.str());
 
-    myassert(ret == "d TCTX | Falan\n");
+    myassert(ret == "1");
+}
+
+void test_nosp_1() {
+    TestLog::devel(__FUNCTION__) << 1 << LogManip::NO_SPACE << 2;
+    auto ret = remove_header(ss_test.str());
+
+    myassert(ret == "12");
+}
+
+void test_nosp_2() {
+    TestLog::devel(__FUNCTION__) << LogManip::NO_SPACE << 1 << 2;
+    auto ret = remove_header(ss_test.str());
+
+    myassert(ret == "1 2");
 }
 
 static std::vector<std::function<void()>> tests = {
-    test_const_char,
+    test_nosp_1,
+    test_nosp_2,
     test_integer,
+    test_const_char,
+    test_remove_header,
 };
 
 void set_up() {

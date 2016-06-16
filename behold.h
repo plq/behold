@@ -138,7 +138,7 @@ private:
     LogLevel m_level;
 
     std::list<std::string> m_line;
-
+    std::list<std::string> m_prelude;
 };
 
 // we need this because of trailing comma issue with __VA_ARGS__
@@ -170,35 +170,38 @@ std::mutex LogEntry<S, out>::s_mutex;
 template <typename S, S &out>
 LogEntry<S, out>::LogEntry(LogLevel l, const char *lc, bool log_time): t(time(NULL)), m_level(l) {
     if (m_level <= LOG_DEVEL) {
-        m_line.push_back("d");
+        m_prelude.push_back("d");
     }
     else if (m_level <= LOG_DEBUG) {
-        m_line.push_back("D");
+        m_prelude.push_back("D");
     }
     else if (m_level <= LOG_INFO) {
-        m_line.push_back("I");
+        m_prelude.push_back("I");
     }
     else if (m_level <= LOG_WARNING) {
-        m_line.push_back("W");
+        m_prelude.push_back("W");
     }
     else if (m_level <= LOG_ERROR) {
-        m_line.push_back("E");
+        m_prelude.push_back("E");
     }
     else if (m_level <= LOG_CRITICAL) {
-        m_line.push_back("C");
+        m_prelude.push_back("C");
     }
     else if (m_level <= LOG_FATAL) {
-        m_line.push_back("F");
+        m_prelude.push_back("F");
     }
     else {
-        m_line.push_back("?");
+        m_prelude.push_back("?");
     }
 
     if (log_time) {
-        *this << t;
+        std::stringstream s;
+        s << t;
+        m_prelude.push_back(s.str());
     }
 
-    *this << lc << "|";
+    m_prelude.push_back(lc);
+    m_prelude.push_back("|");
 }
 
 template <typename S, S &out>
@@ -212,6 +215,10 @@ LogEntry<S, out>::~LogEntry() {
     auto i = b;
 
     std::lock_guard<std::mutex> guard(s_mutex);
+    for (auto &s: m_prelude) {
+        out << s << " ";
+    }
+
     for (auto &s: m_line) {
         auto has_nosp = (i == b || (i < e && (*i)));
         if (! has_nosp) {
@@ -230,9 +237,11 @@ template <typename S, S &out>
 LogEntry<S, out> &LogEntry<S, out>::operator<<(LogManip lm) {
     switch (lm) {
     case LogManip::NO_SPACE: {
-        auto s = m_line.size();
-        m_no_space_indexes.resize(s + 1, false);
-        m_no_space_indexes[s] = true;
+        if (! m_line.empty()) {
+            auto s = m_line.size();
+            m_no_space_indexes.resize(s + 1, false);
+            m_no_space_indexes[s] = true;
+        }
         break;
     }
 

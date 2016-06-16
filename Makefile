@@ -21,7 +21,7 @@ main.o: main.cpp behold.h
 clean:
 	-rm -fv behold test *.o
 
-test.o: behold.h test.cpp
+test.o: behold.h test.cpp tf.h tf.cpp
 	$(CXX) -c test.cpp -o test.o $(CXXFLAGS)
 
 tf.o: tf.cpp tf.h

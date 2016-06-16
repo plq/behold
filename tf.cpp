@@ -38,6 +38,12 @@ std::string escape(const std::string &s) {
     return escape(s.c_str(), s.size());
 }
 
+template<>
+NotEqualsError<std::string, std::string>::NotEqualsError(const std::string &x, const std::string &y): std::runtime_error("") {
+    Logger<decltype(ss), ss, false>::error("TFWR") << escape(x) << "!=" << escape(y);
+    s = ss.str();
+}
+
 std::string remove_header(const std::string &s) {
     auto ret = s.substr(s.find_first_of("|") + 2);
     return ret.substr(0, ret.size() - 1);

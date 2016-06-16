@@ -76,6 +76,7 @@ int run_tests(std::vector<std::function<void()>> &tests) {
                    << ss_status.str() << "\n\n";
             }
 
+            fr << "\n";
             if (ss_test.str().empty()) {
                 fr << "TestLog is empty.\n";
             }
@@ -83,6 +84,8 @@ int run_tests(std::vector<std::function<void()>> &tests) {
                 fr << "TestLog contents:\n"
                    << escape(ss_test.str());
             }
+
+            fr << "\n\nException text:\n" << e.what();
 
             fr <<   "\n==============\n";
 

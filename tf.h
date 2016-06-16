@@ -23,7 +23,6 @@ extern std::stringstream ss_status;
 template <typename T>
 int run_tests(std::vector<std::function<void()>> &tests) {
     using std::cout;
-    using std::cerr;
     using std::endl;
     using std::flush;
 
@@ -67,9 +66,13 @@ int run_tests(std::vector<std::function<void()>> &tests) {
         }
     }
 
+    cout << "\n";
+
     for (auto &f: failed) {
-        cerr << f << endl;
+        cout << f << "\n";
     }
+
+    cout << "\n";
 
     if (failed.empty()) {
         cout << tests.size() << " tests OK" << endl;
